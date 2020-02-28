@@ -43,7 +43,7 @@ impl Species {
                 if n.species == Species::Empty {
                     api.set(0, 0, EMPTY_CELL);
                     api.set(0 ,1, cell);
-                } else if api.get(rx, 1).species == Species::Empty {
+                } else if api.get(rx, 1).species == Species::Empty && api.get(rx, 0).species == Species::Empty {
                     api.set(0, 0, EMPTY_CELL);
                     api.set(rx,1, cell);
                 } else {
@@ -108,7 +108,7 @@ impl World {
                 let xi = x / 8;
                 let yi = y / 8;
                 let c = self.get_cell(xi ,yi);
-                let colour: u32 = match c.species {Species::Empty => {0xFF_FF_FF},Species::Wall => {0x00_FF_FF},Species::Sand => {0xEDC9AF},};
+                let colour: u32 = match c.species {Species::Empty => {0xFF_FF_FF},Species::Wall => {0x424242},Species::Sand => {0xEDC9AF},};
                 let idx = (y as usize)*pitch + (x as usize)*3;
                 buffer[idx] = ((colour & 0xFF_00_00) >> 16) as u8;
                 buffer[idx + 1] = ((colour & 0xFF_00) >> 8) as u8;

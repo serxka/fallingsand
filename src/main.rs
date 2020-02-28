@@ -22,21 +22,27 @@ fn main() -> Result<(), String> {
         .map_err(|e| e.to_string())?;
 
     let mut world = World::new(100, 75);
-    world.paint(1,1, Species::Sand);
+    let mut paint_color = Species::Sand;
 
     let mut event = sdl_context.event_pump()?;
     'running: loop {
         for event in event.poll_iter() {
             match event {
-                Event::Quit {..}
-                | Event::KeyDown { keycode: Some(Keycode::Escape), .. } => {
+                Event::Quit {..} => {
                     break 'running
+                },
+                Event::KeyDown { keycode: Some(key), .. } => {
+                    if key == Keycode::Num1 {
+                        paint_color = Species::Sand;
+                    } else if key == Keycode::Num2 {
+                        paint_color = Species::Wall;
+                    }
                 },
                 Event::MouseMotion {x, y, mousestate, ..} => {
                     if mousestate.is_mouse_button_pressed(MouseButton::Left) {
-                        world.paint((x / 8) as u32, (y / 8) as u32, Species::Sand);
+                        world.paint((x / 8) as u32, (y / 8) as u32, paint_color);
                     }
-                }
+                },
                 _ => {}
             }
         }
