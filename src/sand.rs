@@ -16,6 +16,7 @@ pub struct Cell {
 pub struct World {
     width: i32,
     height: i32,
+    cell_size: i32,
     pub cells: Vec<Cell>,
     generation: u8,
 }
@@ -68,10 +69,11 @@ impl Cell {
 }
 
 impl World {
-    pub fn new (width: u32, height: u32) -> World {
+    pub fn new (width: u32, height: u32, size: u32) -> World {
         World {
             width: width as i32,
             height: height as i32,
+            cell_size: size as i32,
             cells: (0..height*width).map(|_| {EMPTY_CELL}).collect(),
             generation: 0
         }
@@ -96,17 +98,19 @@ impl World {
         if x as i32 > self.width || y as i32 > self.height
             { panic!("out of bounds error"); }
         let i = self.get_index(x as i32, y as i32);
-        self.cells[i] = Cell {
-            species,
-            ra: 0,
-            clock: self.generation,
-        };
+        if self.cells[i].species == Species::Empty {
+            self.cells[i] = Cell {
+                species,
+                ra: 0,
+                clock: self.generation,
+            };
+        }
     }
     pub fn render (&self, buffer: &mut [u8], pitch: usize) {
-        for x in 0..800 {
-            for y in 0..600 {
-                let xi = x / 8;
-                let yi = y / 8;
+        for x in 0..(self.width * self.cell_size) {
+            for y in 0..(self.height * self.cell_size) {
+                let xi = x / self.cell_size;
+                let yi = y / self.cell_size;
                 let c = self.get_cell(xi ,yi);
                 let colour: u32 = match c.species {Species::Empty => {0xFF_FF_FF},Species::Wall => {0x424242},Species::Sand => {0xEDC9AF},};
                 let idx = (y as usize)*pitch + (x as usize)*3;
