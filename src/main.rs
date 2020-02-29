@@ -27,6 +27,7 @@ fn main() -> Result<(), String> {
 
     let mut world = World::new(WINDOW_WIDTH/CELL_SIZE, WINDOW_HEIGHT/CELL_SIZE, CELL_SIZE);
     let mut drawing: (bool, u32, u32, Species) = (false, 0, 0, Species::Sand);
+    let mut paused: bool = false;
 
     let mut event = sdl_context.event_pump()?;
     'running: loop {
@@ -40,6 +41,8 @@ fn main() -> Result<(), String> {
                         drawing.3 = Species::Sand;
                     } else if key == Keycode::Num2 {
                         drawing.3 = Species::Wall;
+                    } else if key == Keycode::Space {
+                        paused = !paused;
                     }
                 },
                 Event::MouseButtonDown {mouse_btn: MouseButton::Left, .. } => 
@@ -56,7 +59,8 @@ fn main() -> Result<(), String> {
         if drawing.0
             { world.paint(drawing.1/CELL_SIZE,drawing.2/CELL_SIZE, drawing.3); }
         // tick the world
-        world.tick();
+        if !paused
+            { world.tick(); }
         // render the world and then display it
         texture.with_lock(None, |b: &mut [u8], p: usize| world.render(b, p))?;
         canvas.clear();
