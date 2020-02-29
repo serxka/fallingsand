@@ -21,7 +21,7 @@ pub struct World {
     generation: u8,
 }
 
-struct Api<'a> {
+pub struct Api<'a> {
     world: &'a mut World,
     x: i32,
     y: i32,
@@ -56,13 +56,6 @@ impl Species {
 }
 
 impl Cell {
-    pub fn new (species: Species) -> Cell {
-        Cell {
-            species,
-            ra: 0,
-            clock: 0
-        }
-    }
     pub fn update (&self, api: Api) {
         self.species.update(*self, api);
     }
