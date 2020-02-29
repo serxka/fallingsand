@@ -1,3 +1,5 @@
+use std::time::{Instant, Duration};
+
 use sdl2::pixels::PixelFormatEnum;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
@@ -9,6 +11,7 @@ use sand::{World, Species};
 const WINDOW_WIDTH: u32 = 1280;
 const WINDOW_HEIGHT: u32 = 720;
 const CELL_SIZE: u32 = 8;
+const TARGET_FPS: u128 = 60;
 
 fn main() -> Result<(), String> {
     let sdl_context = sdl2::init()?;
@@ -31,6 +34,8 @@ fn main() -> Result<(), String> {
 
     let mut event = sdl_context.event_pump()?;
     'running: loop {
+        let time = Instant::now();
+        let next_time = time.elapsed().as_nanos() + (1_000_000_000u128 / TARGET_FPS);
         for event in event.poll_iter() {
             match event {
                 Event::Quit {..} => {
@@ -66,8 +71,10 @@ fn main() -> Result<(), String> {
         canvas.clear();
         canvas.copy(&texture, None, None)?;
         canvas.present();
-        // shitty sleep to get 60fps
-        std::thread::sleep(std::time::Duration::new(0, 1_000_000_000u32 / 60));
+        let elapsed = time.elapsed().as_nanos();
+        if next_time > elapsed {
+            std::thread::sleep(Duration::new(0, (next_time - elapsed) as u32));
+        }
     }
     Ok(())
 }
