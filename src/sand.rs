@@ -40,16 +40,25 @@ impl Species {
             Species::Empty => {},
             Species::Wall => {},
             Species::Sand => {
-                let n = api.get(0, 1);
+                let mut n = api.get(0, 1);
                 let rx = random_dir2();
                 if n.species == Species::Empty {
                     api.set(0, 0, EMPTY_CELL);
                     api.set(0 ,1, cell);
-                } else if api.get(rx, 1).species == Species::Empty && api.get(rx, 0).species == Species::Empty {
+                } else if api.get(rx, 1).species == Species::Empty {
                     api.set(0, 0, EMPTY_CELL);
                     api.set(rx,1, cell);
+                } else if n.species == Species::Water {
+                    api.set(0, 0, n);
+                    api.set(0 ,1, cell);
                 } else {
-                    api.set(0, 0, cell);
+                    n = api.get(rx, 1);
+                    if n.species == Species::Water {
+                        api.set(0, 0, n);
+                        api.set(rx,1, cell);
+                    } else {
+                        api.set(0, 0, cell);
+                    }
                 }
             }
             Species::Water => {
