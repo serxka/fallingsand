@@ -19,7 +19,8 @@ fn main() -> Result<(), String> {
         \n2: Wall\
         \nMinus: Smaller Brush\
         \nEquals: Larger Brush\
-        \nSpace: Toggle Pause");
+        \nSpace: Toggle Pause\
+        \nR: Reset");
     let sdl_context = sdl2::init()?;
     let video_subsystem = sdl_context.video()?;
 
@@ -54,6 +55,7 @@ fn main() -> Result<(), String> {
                         Keycode::Minus => { drawing.5 = if drawing.5 == 2 || drawing.5 == 1 {1} else {drawing.5 - 2}; },
                         Keycode::Equals => { drawing.5 = if drawing.5 == 1 {2} else {drawing.5 + 2}; },
                         Keycode::Space => { paused = !paused;},
+                        Keycode::R => { world.reset(); }
                         _ => {}
                     }
                 },

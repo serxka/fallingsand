@@ -78,6 +78,11 @@ impl World {
             generation: 0
         }
     }
+    pub fn reset (&mut self) {
+        for i in 0..self.height*self.width {
+            self.cells[i as usize] = EMPTY_CELL;
+        }
+    }
     pub fn tick (&mut self) {
         self.generation = self.generation.wrapping_add(1);
         for x in 0..self.width {
