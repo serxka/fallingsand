@@ -18,6 +18,7 @@ fn main() -> Result<(), String> {
     println!("Welcome to falling sand game!\nControls:\
         \n1: Sand\
         \n2: Wall\
+        \n3: Water\
         \nMinus: Smaller Brush\
         \nEquals: Larger Brush\
         \nSpace: Toggle Pause\
