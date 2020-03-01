@@ -14,6 +14,12 @@ const CELL_SIZE: u32 = 8;
 const TARGET_FPS: u128 = 60;
 
 fn main() -> Result<(), String> {
+    println!("Welcome to falling sand game!\nControls:\
+        \n1: Sand\
+        \n2: Wall\
+        \nMinus: Smaller Brush\
+        \nEquals: Larger Brush\
+        \nSpace: Toggle Pause");
     let sdl_context = sdl2::init()?;
     let video_subsystem = sdl_context.video()?;
 
@@ -29,7 +35,7 @@ fn main() -> Result<(), String> {
         .map_err(|e| e.to_string())?;
 
     let mut world = World::new(WINDOW_WIDTH/CELL_SIZE, WINDOW_HEIGHT/CELL_SIZE, CELL_SIZE);
-    let mut drawing: (bool, u32, u32, Species, bool) = (false, 0, 0, Species::Sand, false);
+    let mut drawing: (bool, u32, u32, Species, bool, u32) = (false, 0, 0, Species::Sand, false, 2);
     let mut paused: bool = false;
 
     let mut event = sdl_context.event_pump()?;
@@ -42,12 +48,13 @@ fn main() -> Result<(), String> {
                     break 'running
                 },
                 Event::KeyDown { keycode: Some(key), .. } => {
-                    if key == Keycode::Num1 {
-                        drawing.3 = Species::Sand;
-                    } else if key == Keycode::Num2 {
-                        drawing.3 = Species::Wall;
-                    } else if key == Keycode::Space {
-                        paused = !paused;
+                    match key {
+                        Keycode::Num1 => { drawing.3 = Species::Sand; },
+                        Keycode::Num2 => { drawing.3 = Species::Wall; },
+                        Keycode::Minus => { drawing.5 = if drawing.5 == 2 || drawing.5 == 1 {1} else {drawing.5 - 2}; },
+                        Keycode::Equals => { drawing.5 = if drawing.5 == 1 {2} else {drawing.5 + 2}; },
+                        Keycode::Space => { paused = !paused;},
+                        _ => {}
                     }
                 },
                 Event::MouseButtonDown {mouse_btn, .. } => {
@@ -71,9 +78,9 @@ fn main() -> Result<(), String> {
         }
         if drawing.0 {
             if drawing.4
-                {world.paint(drawing.1/CELL_SIZE,drawing.2/CELL_SIZE, Species::Empty, true);}
+                {world.paint(drawing.1/CELL_SIZE,drawing.2/CELL_SIZE, drawing.5, Species::Empty, true);}
             else
-                {world.paint(drawing.1/CELL_SIZE,drawing.2/CELL_SIZE, drawing.3, false);}
+                {world.paint(drawing.1/CELL_SIZE,drawing.2/CELL_SIZE, drawing.5, drawing.3, false);}
         }
         // tick the world
         if !paused

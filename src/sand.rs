@@ -56,6 +56,13 @@ impl Species {
 }
 
 impl Cell {
+    pub fn new (species: Species, ra: u8, clock: u8) -> Cell {
+        Cell {
+            species,
+            ra,
+            clock,
+        }
+    }
     pub fn update (&self, api: Api) {
         self.species.update(*self, api);
     }
@@ -87,22 +94,32 @@ impl World {
         }
         self.generation = self.generation.wrapping_add(1);
     }
-    pub fn paint (&mut self, x: u32, y: u32, species: Species, erase: bool) {
-        if x as i32 > self.width || y as i32 > self.height
-            { panic!("out of bounds error"); }
-        let i = self.get_index(x as i32, y as i32);
-        if erase {
-            self.cells[i] = Cell {
-                species,
-                ra: 0,
-                clock: self.generation,
-            };
-        } else if self.cells[i].species == Species::Empty {
-            self.cells[i] = Cell {
-                species,
-                ra: 0,
-                clock: self.generation,
-            };
+    pub fn paint (&mut self, x: u32, y: u32, s: u32, species: Species, erase: bool) {
+        let x = x as i32;
+        let y = y as i32;
+        let r = (s/2) as i32;
+        if s == 1 {
+            let i = self.get_index(x, y);
+            if erase {
+                self.cells[i] = Cell::new(species, 0, self.generation);
+            } else if self.cells[i].species == Species::Empty {
+                self.cells[i] = Cell::new(species, 0, self.generation);
+            }
+            return;
+        }
+        for rx in -r..r {
+            for ry in -r..r {
+                let px = x + rx;
+                let py = y + ry;
+                if px > self.width || px < 0 || py > self.height || py < 0
+                    {continue;}
+                let i = self.get_index(px, py);
+                if erase {
+                    self.cells[i] = Cell::new(species, 0, self.generation);
+                } else if self.cells[i].species == Species::Empty {
+                    self.cells[i] = Cell::new(species, 0, self.generation);
+                }
+            }
         }
     }
     pub fn render (&self, buffer: &mut [u8], pitch: usize) {
