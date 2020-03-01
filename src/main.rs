@@ -1,6 +1,7 @@
 use std::time::{Instant, Duration};
 
 use sdl2::pixels::PixelFormatEnum;
+use sdl2::rect::Rect;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::mouse::MouseButton;
@@ -31,9 +32,6 @@ fn main() -> Result<(), String> {
         .map_err(|e| e.to_string())?;
 
     let mut canvas = window.into_canvas().build().map_err(|e| e.to_string())?;
-    let texture_creator = canvas.texture_creator();
-    let mut texture = texture_creator.create_texture_streaming(PixelFormatEnum::RGB24, WINDOW_WIDTH, WINDOW_HEIGHT)
-        .map_err(|e| e.to_string())?;
 
     let mut world = World::new(WINDOW_WIDTH/CELL_SIZE, WINDOW_HEIGHT/CELL_SIZE, CELL_SIZE);
     let mut drawing: (bool, u32, u32, Species, bool, u32) = (false, 0, 0, Species::Sand, false, 2);
@@ -88,9 +86,25 @@ fn main() -> Result<(), String> {
         if !paused
             { world.tick(); }
         // render the world and then display it
-        texture.with_lock(None, |b: &mut [u8], p: usize| world.render(b, p))?;
         canvas.clear();
-        canvas.copy(&texture, None, None)?;
+        canvas.set_draw_color(sdl2::pixels::Color::RGB(255,0,0));
+        let mut rect = Rect::new(0,0,CELL_SIZE,CELL_SIZE);
+
+        for x in 0..WINDOW_WIDTH/CELL_SIZE {
+            for y in 0..WINDOW_HEIGHT/CELL_SIZE {
+                let c = world.get_cell(x as i32, y as i32);
+                let colour: u32 = match c.species {Species::Empty => {0xFF_FF_FF},Species::Wall => {0x424242},Species::Sand => {0xEDC9AF},};
+                canvas.set_draw_color(sdl2::pixels::Color::RGB(
+                    ((colour & 0xFF_00_00) >> 16) as u8,
+                    ((colour & 0xFF_00) >> 8) as u8,
+                    (colour & 0xFF) as u8));
+                rect.set_x((x*CELL_SIZE) as i32);
+                rect.set_y((y*CELL_SIZE) as i32);
+                canvas.fill_rect(Some(rect)).unwrap();
+            }
+        }
+
+        canvas.set_draw_color(sdl2::pixels::Color::RGB(255,255,255));
         canvas.present();
         let elapsed = time.elapsed().as_nanos();
         if next_time > elapsed {

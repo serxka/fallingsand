@@ -7,8 +7,8 @@ pub enum Species {
 
 #[derive(Clone, Copy, Debug)]
 pub struct Cell {
-    species: Species,
-    ra: u8,
+    pub species: Species,
+    pub ra: u8,
     clock: u8,
 }
 
@@ -141,7 +141,7 @@ impl World {
             }
         }
     }
-    fn get_cell (&self, x: i32, y: i32) -> Cell {
+    pub fn get_cell (&self, x: i32, y: i32) -> Cell {
         self.cells[((y*self.width)+x) as usize]
     }
     fn get_index (&self, x: i32, y: i32) -> usize {
