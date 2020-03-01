@@ -50,6 +50,7 @@ fn main() -> Result<(), String> {
                     match key {
                         Keycode::Num1 => { drawing.3 = Species::Sand; },
                         Keycode::Num2 => { drawing.3 = Species::Wall; },
+                        Keycode::Num3 => { drawing.3 = Species::Water; },
                         Keycode::Minus => { drawing.5 = if drawing.5 == 2 || drawing.5 == 1 {1} else {drawing.5 - 2}; },
                         Keycode::Equals => { drawing.5 = if drawing.5 == 1 {2} else {drawing.5 + 2}; },
                         Keycode::Space => { paused = !paused;},
@@ -93,7 +94,11 @@ fn main() -> Result<(), String> {
         for x in 0..WINDOW_WIDTH/CELL_SIZE {
             for y in 0..WINDOW_HEIGHT/CELL_SIZE {
                 let c = world.get_cell(x as i32, y as i32);
-                let colour: u32 = match c.species {Species::Empty => {0xFF_FF_FF},Species::Wall => {0x424242},Species::Sand => {0xEDC9AF},};
+                let colour: u32 = match c.species {
+                        Species::Empty => {0xFF_FF_FF},
+                        Species::Wall => {0x424242},
+                        Species::Sand => {0xEDC9AF},
+                        Species::Water => {0x0000FF},};
                 canvas.set_draw_color(sdl2::pixels::Color::RGB(
                     ((colour & 0xFF_00_00) >> 16) as u8,
                     ((colour & 0xFF_00) >> 8) as u8,

@@ -3,6 +3,7 @@ pub enum Species {
     Empty = 0,
     Wall = 1,
     Sand = 2,
+    Water = 3,
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -51,6 +52,25 @@ impl Species {
                     api.set(0, 0, cell);
                 }
             }
+            Species::Water => {
+                for &i in random_dir_vec().iter() {
+                    let n = api.get(i, 1);
+                    if n.species == Species::Empty {
+                        api.set(0, 0, EMPTY_CELL);
+                        api.set(i, 1, cell);
+                        return;
+                    }
+
+                }
+                let rx = random_dir2();
+                if api.get(rx, 0).species == Species::Empty {
+                    api.set(0, 0, EMPTY_CELL);
+                    api.set(rx, 0, cell);
+                } else if api.get(-rx, 0).species == Species::Empty {
+                    api.set(0, 0, EMPTY_CELL);
+                    api.set(-rx, 0, cell);
+                }
+            },
         } 
     }
 }
@@ -127,20 +147,6 @@ impl World {
             }
         }
     }
-    pub fn render (&self, buffer: &mut [u8], pitch: usize) {
-        for x in 0..(self.width * self.cell_size) {
-            for y in 0..(self.height * self.cell_size) {
-                let xi = x / self.cell_size;
-                let yi = y / self.cell_size;
-                let c = self.get_cell(xi ,yi);
-                let colour: u32 = match c.species {Species::Empty => {0xFF_FF_FF},Species::Wall => {0x424242},Species::Sand => {0xEDC9AF},};
-                let idx = (y as usize)*pitch + (x as usize)*3;
-                buffer[idx] = ((colour & 0xFF_00_00) >> 16) as u8;
-                buffer[idx + 1] = ((colour & 0xFF_00) >> 8) as u8;
-                buffer[idx + 2] = (colour & 0xFF) as u8;
-            }
-        }
-    }
     pub fn get_cell (&self, x: i32, y: i32) -> Cell {
         self.cells[((y*self.width)+x) as usize]
     }
@@ -179,6 +185,19 @@ impl<'a> Api<'a> {
 
 fn random_dir () -> i32 {
     return (rand::random::<i32>() % 3) -1;
+}
+
+fn random_dir_vec () -> [i32;3] {
+    let r = rand::random::<i32>() % 6;
+    return match r {
+        0 => [-1,0,1],
+        1 => [0,-1,1],
+        2 => [1,-1,0],
+        3 => [-1,1,0],
+        4 => [0,1,-1],
+        5 => [1,0,-1],
+        _ => [0,0,0],
+    }
 }
 
 fn random_dir2 () -> i32 {
