@@ -87,11 +87,17 @@ impl World {
         }
         self.generation = self.generation.wrapping_add(1);
     }
-    pub fn paint (&mut self, x: u32, y: u32, species: Species) {
+    pub fn paint (&mut self, x: u32, y: u32, species: Species, erase: bool) {
         if x as i32 > self.width || y as i32 > self.height
             { panic!("out of bounds error"); }
         let i = self.get_index(x as i32, y as i32);
-        if self.cells[i].species == Species::Empty {
+        if erase {
+            self.cells[i] = Cell {
+                species,
+                ra: 0,
+                clock: self.generation,
+            };
+        } else if self.cells[i].species == Species::Empty {
             self.cells[i] = Cell {
                 species,
                 ra: 0,

@@ -29,7 +29,7 @@ fn main() -> Result<(), String> {
         .map_err(|e| e.to_string())?;
 
     let mut world = World::new(WINDOW_WIDTH/CELL_SIZE, WINDOW_HEIGHT/CELL_SIZE, CELL_SIZE);
-    let mut drawing: (bool, u32, u32, Species) = (false, 0, 0, Species::Sand);
+    let mut drawing: (bool, u32, u32, Species, bool) = (false, 0, 0, Species::Sand, false);
     let mut paused: bool = false;
 
     let mut event = sdl_context.event_pump()?;
@@ -50,10 +50,18 @@ fn main() -> Result<(), String> {
                         paused = !paused;
                     }
                 },
-                Event::MouseButtonDown {mouse_btn: MouseButton::Left, .. } => 
-                    {drawing.0 = true;},
-                Event::MouseButtonUp {mouse_btn: MouseButton::Left, .. } => 
-                    {drawing.0 = false;},
+                Event::MouseButtonDown {mouse_btn, .. } => {
+                    if mouse_btn == MouseButton::Right {
+                        drawing.4 = true;
+                    }
+                    drawing.0 = true;
+                },
+                Event::MouseButtonUp {mouse_btn, .. } => {
+                    if mouse_btn == MouseButton::Right {
+                         drawing.4 = false;
+                    }
+                    drawing.0 = false;
+                },
                 Event::MouseMotion {x, y, ..} => {
                     drawing.1 = x as u32;
                     drawing.2 = y as u32;
@@ -61,8 +69,12 @@ fn main() -> Result<(), String> {
                 _ => {}
             }
         }
-        if drawing.0
-            { world.paint(drawing.1/CELL_SIZE,drawing.2/CELL_SIZE, drawing.3); }
+        if drawing.0 {
+            if drawing.4
+                {world.paint(drawing.1/CELL_SIZE,drawing.2/CELL_SIZE, Species::Empty, true);}
+            else
+                {world.paint(drawing.1/CELL_SIZE,drawing.2/CELL_SIZE, drawing.3, false);}
+        }
         // tick the world
         if !paused
             { world.tick(); }
