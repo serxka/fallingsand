@@ -111,7 +111,7 @@ impl World {
             for ry in -r..r {
                 let px = x + rx;
                 let py = y + ry;
-                if px > self.width || px < 0 || py > self.height || py < 0
+                if px >= self.width || px < 0 || py >= self.height || py < 0
                     {continue;}
                 let i = self.get_index(px, py);
                 if erase {
