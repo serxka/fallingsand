@@ -1,5 +1,5 @@
 use std::time::{Instant, Duration};
-
+    
 use sdl2::rect::Rect;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
@@ -87,8 +87,6 @@ fn main() -> Result<(), String> {
         if !paused
             { world.tick(); }
         // render the world and then display it
-        canvas.clear();
-        canvas.set_draw_color(sdl2::pixels::Color::RGB(255,0,0));
         let mut rect = Rect::new(0,0,CELL_SIZE,CELL_SIZE);
 
         for x in 0..WINDOW_WIDTH/CELL_SIZE {
@@ -98,7 +96,7 @@ fn main() -> Result<(), String> {
                         Species::Empty => {0xFF_FF_FF},
                         Species::Wall => {0x424242},
                         Species::Sand => {0xEDC9AF},
-                        Species::Water => {0x0000FF},};
+                        Species::Water => {0x4169e1},};
                 canvas.set_draw_color(sdl2::pixels::Color::RGB(
                     ((colour & 0xFF_00_00) >> 16) as u8,
                     ((colour & 0xFF_00) >> 8) as u8,
@@ -109,7 +107,6 @@ fn main() -> Result<(), String> {
             }
         }
 
-        canvas.set_draw_color(sdl2::pixels::Color::RGB(255,255,255));
         canvas.present();
         let elapsed = time.elapsed().as_nanos();
         if next_time > elapsed {

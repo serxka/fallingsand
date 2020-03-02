@@ -85,10 +85,10 @@ impl Species {
 }
 
 impl Cell {
-    pub fn new (species: Species, ra: u8, clock: u8) -> Cell {
+    pub fn new (species: Species, clock: u8) -> Cell {
         Cell {
             species,
-            ra,
+            ra: rand::random::<u8>(),
             clock,
         }
     }
@@ -135,9 +135,9 @@ impl World {
         if s == 1 {
             let i = self.get_index(x, y);
             if erase {
-                self.cells[i] = Cell::new(species, 0, self.generation);
+                self.cells[i] = Cell::new(species, self.generation);
             } else if self.cells[i].species == Species::Empty {
-                self.cells[i] = Cell::new(species, 0, self.generation);
+                self.cells[i] = Cell::new(species, self.generation);
             }
             return;
         }
@@ -149,9 +149,9 @@ impl World {
                     {continue;}
                 let i = self.get_index(px, py);
                 if erase {
-                    self.cells[i] = Cell::new(species, 0, self.generation);
+                    self.cells[i] = Cell::new(species, self.generation);
                 } else if self.cells[i].species == Species::Empty {
-                    self.cells[i] = Cell::new(species, 0, self.generation);
+                    self.cells[i] = Cell::new(species, self.generation);
                 }
             }
         }
@@ -171,11 +171,7 @@ impl<'a> Api<'a> {
         let nx = self.x + dx;
         let ny = self.y + dy;
         if nx < 0 || nx >= self.world.width || ny < 0 || ny >= self.world.height {
-            return Cell {
-                species: Species::Wall,
-                ra: 0,
-                clock: self.world.generation
-            }
+            return Cell::new(Species::Wall, self.world.generation);
         }
         self.world.get_cell(nx, ny)
     }
